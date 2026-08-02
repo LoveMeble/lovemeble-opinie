@@ -1,0 +1,36 @@
+name: Pobierz opinie Google
+
+on:
+  schedule:
+    - cron: "0 4 * * *"   # codziennie ~06:00 czasu polskiego (04:00 UTC)
+  workflow_dispatch: {}    # pozwala uruchomić ręcznie (przycisk "Run workflow")
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Pobierz opinie z Google
+        env:
+          GOOGLE_PLACES_KEY: ${{ secrets.GOOGLE_PLACES_KEY }}
+        run: node fetch-reviews.js
+
+      - name: Zapisz reviews.json (jeśli się zmienił)
+        run: |
+          if [ -n "$(git status --porcelain reviews.json)" ]; then
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add reviews.json
+            git commit -m "Aktualizacja opinii Google"
+            git push
+          else
+            echo "Brak zmian w opiniach"
+          fi
