@@ -2,8 +2,12 @@ name: Pobierz opinie Google
 
 on:
   schedule:
-    - cron: "0 4 * * *"   # codziennie ~06:00 czasu polskiego (04:00 UTC)
-  workflow_dispatch: {}    # pozwala uruchomić ręcznie (przycisk "Run workflow")
+    # Kilka prób dziennie — GitHub bywa niepunktualny/pomija cron, więc dajemy
+    # redundancję. Wystarczy, że jedna z nich się wykona. (3 zapytania/dobę = grosze.)
+    - cron: "0 5 * * *"    # ~07:00 czasu PL
+    - cron: "0 11 * * *"   # ~13:00 czasu PL
+    - cron: "0 17 * * *"   # ~19:00 czasu PL
+  workflow_dispatch: {}    # ręczne uruchomienie (przycisk "Run workflow")
 
 permissions:
   contents: write
